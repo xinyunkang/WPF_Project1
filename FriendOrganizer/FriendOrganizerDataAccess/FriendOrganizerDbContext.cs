@@ -17,5 +17,7 @@ namespace FriendOrganizerDataAccess
             base.OnModelCreating(modelBuilder);
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>(); //use singlar table name, instead of Plural
         }
+
+
     }
 }
