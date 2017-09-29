@@ -1,4 +1,5 @@
 ﻿using FriendOrganizer.UI.ViewModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FriendOrganizer.UI
@@ -15,9 +16,9 @@ namespace FriendOrganizer.UI
             Loaded += MainWindow_Loaded; //add the load event, do not write dataloading call in constructor directly.
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)//Event handlers naturally return void, so async methods return void so that you can have an asynchronous event handler. 
         {
-            _viewModel.Load();
+            await _viewModel.LoadAsync();
         }
     }
 }

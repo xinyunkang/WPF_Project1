@@ -1,6 +1,7 @@
 ﻿using FriendOrganizer.Model;
 using FriendOrganizer.UI.Data;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -17,9 +18,9 @@ namespace FriendOrganizer.UI.ViewModel
 
         }
 
-        public void Load()  //naming rule, the function must start with upper case.
+        public async Task LoadAsync()  //naming rule, the function must start with upper case.
         {
-            var friends = _friendDataService.GetAll();
+            var friends = await _friendDataService.GetAllAsync();
             Friends.Clear();
             foreach(var friend in friends)
             {

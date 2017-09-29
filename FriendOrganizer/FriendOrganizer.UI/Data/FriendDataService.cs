@@ -2,6 +2,7 @@
 using FriendOrganizerDataAccess;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace FriendOrganizer.UI.Data
         {
             _contextCreator = contextCreator;
         }
-        public IEnumerable<Friend> GetAll()
+        public async Task<List<Friend>> GetAllAsync()
         {
             //// TODO: Load data from real database
             //yield return new Friend { FirstName = "Thomas", LastName = "Huber" };
@@ -26,7 +27,7 @@ namespace FriendOrganizer.UI.Data
 
            using(var ctx= _contextCreator())
             {
-               return ctx.Friends.AsNoTracking().ToList();
+               return await ctx.Friends.AsNoTracking().ToListAsync();
             }
         }
     }
