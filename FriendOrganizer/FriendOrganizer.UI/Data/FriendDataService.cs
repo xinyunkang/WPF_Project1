@@ -17,18 +17,31 @@ namespace FriendOrganizer.UI.Data
         {
             _contextCreator = contextCreator;
         }
-        public async Task<List<Friend>> GetAllAsync()
-        {
-            //// TODO: Load data from real database
-            //yield return new Friend { FirstName = "Thomas", LastName = "Huber" };
-            //yield return new Friend { FirstName = "Andreas", LastName = "Boehler" };
-            //yield return new Friend { FirstName = "Julia", LastName = "Huber" };
-            //yield return new Friend { FirstName = "Chrissi", LastName = "Egin" };
 
-           using(var ctx= _contextCreator())
+
+        //public async Task<List<Friend>> GetAllAsync()  //We have loaded all the friends already in the navigation.
+        //{
+        //    //// TODO: Load data from real database
+        //    //yield return new Friend { FirstName = "Thomas", LastName = "Huber" };
+        //    //yield return new Friend { FirstName = "Andreas", LastName = "Boehler" };
+        //    //yield return new Friend { FirstName = "Julia", LastName = "Huber" };
+        //    //yield return new Friend { FirstName = "Chrissi", LastName = "Egin" };
+
+        //   using(var ctx= _contextCreator())
+        //    {
+        //       return await ctx.Friends.AsNoTracking().ToListAsync();
+        //    }
+        //}
+
+        public async Task<Friend> GetByIdAsync(int friendId)
+        {
+           
+
+            using (var ctx = _contextCreator())
             {
-               return await ctx.Friends.AsNoTracking().ToListAsync();
+                return await ctx.Friends.AsNoTracking().SingleAsync(f=>f.Id==friendId); //singleAsync only return one.
             }
         }
+
     }
 }

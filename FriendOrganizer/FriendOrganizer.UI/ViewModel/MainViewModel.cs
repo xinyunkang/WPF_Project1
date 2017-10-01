@@ -7,39 +7,24 @@ namespace FriendOrganizer.UI.ViewModel
 {
     public class MainViewModel: ViewModelBase
     {
-        private IFriendDataService _friendDataService;
-        private Friend _selectedFriend;
-
-
-        public MainViewModel(IFriendDataService friendDataService)   //pass in the interface service
+        
+        public MainViewModel(INavigationViewModel navigationViewModel,
+            IFriendDetailViewModel friendDetailViewModel
+            )   //pass in the interface service
         {
-            Friends = new ObservableCollection<Friend>();
-            _friendDataService = friendDataService;
-
+            NavigationViewModel = navigationViewModel;
+            FriendDetailViewModel = friendDetailViewModel; //assign to a property
         }
+
+        public INavigationViewModel NavigationViewModel { get; }
 
         public async Task LoadAsync()  //naming rule, the function must start with upper case.
         {
-            var friends = await _friendDataService.GetAllAsync();
-            Friends.Clear();
-            foreach(var friend in friends)
-            {
-                Friends.Add(friend);
-            }
+            NavigationViewModel.LoadAsync();
         }
-        //ObservableCollection：  Represents a dynamic data collection that provides notifications when items get added, removed, or when the whole list is refreshed.
-        public ObservableCollection<Friend> Friends { get; set; }
 
+        public IFriendDetailViewModel FriendDetailViewModel { get;  }  //create property. We don't need setter because we set the property directly in the constructor 
 
-
-        public Friend SelectedFriend
-        {
-            get { return _selectedFriend; }
-            set {
-                _selectedFriend = value;
-                OnPropertyChanged(); //the property is default to SelectedFriend
-            }
-        }
 
     }
 }
