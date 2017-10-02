@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using FriendOrganizer.Model;
 using Prism.Events;
 using FriendOrganizer.UI.Event;
+using System.Windows.Input;
+using Prism.Commands;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -22,6 +24,25 @@ namespace FriendOrganizer.UI.ViewModel
             _eventAggregator = eventAggregator;
             _eventAggregator.GetEvent<OpenFriendDetailViewEvent>()
                 .Subscribe(OnOpenFriendDetailView);   //To subscribe the event published by NavigationViewModel.
+
+            SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
+        }
+
+        private bool OnSaveCanExecute()
+        {
+            return true;
+        }
+
+        private async void OnSaveExecute()
+        {
+            await _friendDataService.SaveAsync(Friend); //pass in the Friend property
+            _eventAggregator.GetEvent<AfterFriendSavedEvent>().Publish(
+                new AfterFriendSavedEventArgs
+                {
+                    Id = Friend.Id,
+                    DisplayMember=$"{Friend.FirstName} {Friend.LastName}"
+                }
+                );
         }
 
         private async void OnOpenFriendDetailView(int friendId)
@@ -45,6 +66,8 @@ namespace FriendOrganizer.UI.ViewModel
                 OnPropertyChanged(); //In ViewModelBase
             }
         }
+
+        public ICommand SaveCommand { get; } //do not need set, which is initialize directly in the constructor.
 
     }
 }
