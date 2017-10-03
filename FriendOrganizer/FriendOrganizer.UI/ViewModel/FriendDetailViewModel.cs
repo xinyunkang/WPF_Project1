@@ -9,6 +9,7 @@ using Prism.Events;
 using FriendOrganizer.UI.Event;
 using System.Windows.Input;
 using Prism.Commands;
+using FriendOrganizer.UI.Wrapper;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -30,12 +31,13 @@ namespace FriendOrganizer.UI.ViewModel
 
         private bool OnSaveCanExecute()
         {
-            return true;
+            //To check condition if friend is changed.
+            return Friend!=null&&!Friend.HasErrors;
         }
 
         private async void OnSaveExecute()
         {
-            await _friendDataService.SaveAsync(Friend); //pass in the Friend property
+            await _friendDataService.SaveAsync(Friend.Model); //pass in the Friend property
             _eventAggregator.GetEvent<AfterFriendSavedEvent>().Publish(
                 new AfterFriendSavedEventArgs
                 {
@@ -52,13 +54,25 @@ namespace FriendOrganizer.UI.ViewModel
 
         public async Task LoadAsync(int friendId)
         {
-            Friend = await _friendDataService.GetByIdAsync(friendId);
+            //Friend = await _friendDataService.GetByIdAsync(friendId);  use friendwrapper instead.
+            var friend = await _friendDataService.GetByIdAsync(friendId);
+            Friend = new FriendWrapper(friend);
+            Friend.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Friend.HasErrors))
+                {
+                    ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
+
+                }
+            };
+            ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();//Raises CanExecuteChanged on the UI thread so every command invoker can requery to check if the command can execute.
+
         }
 
         //propfull tab tab
-        private Friend _friend;
+        private FriendWrapper _friend;
 
-        public Friend Friend
+        public FriendWrapper Friend
         {
             get { return _friend; }
             set {
