@@ -1,7 +1,9 @@
-﻿using FriendOrganizer.Model;
-using FriendOrganizer.UI.Data;
-using System.Collections.ObjectModel;
+﻿using FriendOrganizer.UI.Event;
+using FriendOrganizer.UI.View.Services;
+using Prism.Events;
+using System;
 using System.Threading.Tasks;
+using static FriendOrganizer.UI.View.Services.MessageDialogService;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -9,22 +11,56 @@ namespace FriendOrganizer.UI.ViewModel
     {
         
         public MainViewModel(INavigationViewModel navigationViewModel,
-            IFriendDetailViewModel friendDetailViewModel
+            Func<IFriendDetailViewModel> friendDetailViewModelCreator,
+            IEventAggregator eventAggregator,
+            IMessageDialogService messageDialogService
             )   //pass in the interface service
         {
             NavigationViewModel = navigationViewModel;
-            FriendDetailViewModel = friendDetailViewModel; //assign to a property
+            _FriendDetailViewModelCreator = friendDetailViewModelCreator; //assign to a property
+            _eventAggregator = eventAggregator;
+            _messageDialogService = messageDialogService;
+
+            _eventAggregator.GetEvent<OpenFriendDetailViewEvent>()
+              .Subscribe(OnOpenFriendDetailView);   //To subscribe the event published by NavigationViewModel.
+
+        }
+
+        private async void OnOpenFriendDetailView(int friendId)
+        {
+            if (FriendDetailViewModel != null && FriendDetailViewModel.HasChanges)
+            {
+               var result= _messageDialogService.ShowOkCancelDailog("You have made changes. Navigate away?", "Question");
+                if(result==MessageDialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+            FriendDetailViewModel = _FriendDetailViewModelCreator();
+            await FriendDetailViewModel.LoadAsync(friendId);
         }
 
         public INavigationViewModel NavigationViewModel { get; }
+
+        private Func<IFriendDetailViewModel> _FriendDetailViewModelCreator;
 
         public async Task LoadAsync()  //naming rule, the function must start with upper case.
         {
             NavigationViewModel.LoadAsync();
         }
 
-        public IFriendDetailViewModel FriendDetailViewModel { get;  }  //create property. We don't need setter because we set the property directly in the constructor 
+        private IFriendDetailViewModel _friendDetailViewModel;
 
+        public IFriendDetailViewModel FriendDetailViewModel
+        {
+            get { return _friendDetailViewModel; }
+            set {
+                _friendDetailViewModel = value;
+                OnPropertyChanged();
+            }
+        }
 
+        private IEventAggregator _eventAggregator;
+        private IMessageDialogService _messageDialogService;
     }
 }
