@@ -29,8 +29,16 @@ namespace FriendOrganizer.UI.ViewModel
 
         private void AfterFriendSaved(AfterFriendSavedEventArgs obj)
         {
-            var lookupItem = Friends.Single(f => f.Id == obj.Id);  //datatype of friend is lookupitem
-            lookupItem.DisplayMember = obj.DisplayMember;
+            var lookupItem = Friends.SingleOrDefault(f => f.Id == obj.Id);  //datatype of friend is lookupitem
+            if (lookupItem == null)
+            {
+                Friends.Add(new NavigationItemViewModel(obj.Id, obj.DisplayMember, _eventAggregator));
+            }
+            else
+            {
+                lookupItem.DisplayMember = obj.DisplayMember;
+
+            }
         }
 
         //private NavigationItemViewModel _selectedFriend;

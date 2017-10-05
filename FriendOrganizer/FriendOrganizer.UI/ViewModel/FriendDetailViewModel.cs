@@ -66,10 +66,12 @@ namespace FriendOrganizer.UI.ViewModel
 
 
 
-        public async Task LoadAsync(int friendId)
+        public async Task LoadAsync(int? friendId)
         {
             //Friend = await _friendDataService.GetByIdAsync(friendId);  use friendwrapper instead.
-            var friend = await _friendRepository.GetByIdAsync(friendId);
+            var friend = friendId.HasValue
+                ?await _friendRepository.GetByIdAsync(friendId.Value)
+                :CreateNewFriend();
             Friend = new FriendWrapper(friend);
             Friend.PropertyChanged += (s, e) =>
             {
@@ -86,6 +88,13 @@ namespace FriendOrganizer.UI.ViewModel
             };
             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();//Raises CanExecuteChanged on the UI thread so every command invoker can requery to check if the command can execute.
 
+        }
+
+        private Friend CreateNewFriend()
+        {
+            var friend = new Friend();
+            _friendRepository.Add(friend);
+            return friend;
         }
 
         //propfull tab tab

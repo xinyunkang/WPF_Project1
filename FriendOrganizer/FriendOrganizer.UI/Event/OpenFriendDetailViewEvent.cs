@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FriendOrganizer.UI.Event
 {
-    public class OpenFriendDetailViewEvent:PubSubEvent<int> //inherit from PubSubEvent from Prism, int for friendID
+    public class OpenFriendDetailViewEvent:PubSubEvent<int?> //inherit from PubSubEvent from Prism, int for friendID
     {
         
     }
