@@ -11,6 +11,8 @@ using System.Windows.Input;
 using Prism.Commands;
 using FriendOrganizer.UI.Wrapper;
 using FriendOrganizer.UI.Data.Repositories;
+using FriendOrganizer.UI.View.Services;
+using static FriendOrganizer.UI.View.Services.MessageDialogService;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -18,14 +20,30 @@ namespace FriendOrganizer.UI.ViewModel
     {
         private IFriendRepository _friendRepository;
         private IEventAggregator _eventAggregator;
+        private IMessageDialogService _messageDialogService;
 
         public FriendDetailViewModel(IFriendRepository friendRepository,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IMessageDialogService messageDialogService)
         {
             _friendRepository = friendRepository;
             _eventAggregator = eventAggregator;
+            _messageDialogService = messageDialogService;
 
             SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
+            DeleteCommand = new DelegateCommand(OnDeleteExecute);
+
+        }
+
+        private async void OnDeleteExecute()
+        {
+            var result = _messageDialogService.ShowOkCancelDailog($"Do you want to delete this friend?", "Question");
+            if (result == MessageDialogResult.OK)
+            {
+                _friendRepository.Remove(Friend.Model);
+                await _friendRepository.SaveAsync();
+                _eventAggregator.GetEvent<AfterFriendDeletedEvent>().Publish(Friend.Id);
+            }
         }
 
         private bool _hasChanges;
@@ -40,6 +58,11 @@ namespace FriendOrganizer.UI.ViewModel
                     _hasChanges = value;
                     OnPropertyChanged();
                     ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();//Raises CanExecuteChanged on the UI thread so every command invoker can requery to check if the command can execute.
+                    if (Friend.Id == 0)//new friend is created
+                    {
+                        //little trick to trigger the validation
+                        Friend.FirstName = "";
+                    }
                 }
             }
         }
@@ -111,6 +134,7 @@ namespace FriendOrganizer.UI.ViewModel
         }
 
         public ICommand SaveCommand { get; } //do not need set, which is initialize directly in the constructor.
+        public ICommand DeleteCommand { get; } //do not need set, which is initialize directly in the constructor.
 
     }
 }

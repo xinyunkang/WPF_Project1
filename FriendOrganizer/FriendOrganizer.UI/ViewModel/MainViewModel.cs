@@ -25,12 +25,16 @@ namespace FriendOrganizer.UI.ViewModel
 
             _eventAggregator.GetEvent<OpenFriendDetailViewEvent>()
               .Subscribe(OnOpenFriendDetailView);   //To subscribe the event published by NavigationViewModel.
-
+            _eventAggregator.GetEvent<AfterFriendDeletedEvent>()
+                .Subscribe(AfterFriendDeleted);
             CreateNewFriendCommand = new DelegateCommand(OnCreateNewFriendExecute);
 
         }
 
-        
+        private void AfterFriendDeleted(int friendId)
+        {
+            FriendDetailViewModel = null;
+        }
 
         private async void OnOpenFriendDetailView(int? friendId)
         {
