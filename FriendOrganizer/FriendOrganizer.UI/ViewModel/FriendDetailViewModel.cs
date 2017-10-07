@@ -13,6 +13,8 @@ using FriendOrganizer.UI.Wrapper;
 using FriendOrganizer.UI.Data.Repositories;
 using FriendOrganizer.UI.View.Services;
 using static FriendOrganizer.UI.View.Services.MessageDialogService;
+using FriendOrganizer.UI.Data.Lookups;
+using System.Collections.ObjectModel;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -21,17 +23,22 @@ namespace FriendOrganizer.UI.ViewModel
         private IFriendRepository _friendRepository;
         private IEventAggregator _eventAggregator;
         private IMessageDialogService _messageDialogService;
+        private IProgrammingLanguageLookupDataService _programmingLanguageLookupDataService;
 
         public FriendDetailViewModel(IFriendRepository friendRepository,
             IEventAggregator eventAggregator,
-            IMessageDialogService messageDialogService)
+            IMessageDialogService messageDialogService,
+            IProgrammingLanguageLookupDataService programmingLanguageLookupDataService)
         {
             _friendRepository = friendRepository;
             _eventAggregator = eventAggregator;
             _messageDialogService = messageDialogService;
+            _programmingLanguageLookupDataService = programmingLanguageLookupDataService;
 
             SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
             DeleteCommand = new DelegateCommand(OnDeleteExecute);
+
+            ProgrammingLanguages = new ObservableCollection<LookupItem>(); 
 
         }
 
@@ -58,11 +65,7 @@ namespace FriendOrganizer.UI.ViewModel
                     _hasChanges = value;
                     OnPropertyChanged();
                     ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();//Raises CanExecuteChanged on the UI thread so every command invoker can requery to check if the command can execute.
-                    if (Friend.Id == 0)//new friend is created
-                    {
-                        //little trick to trigger the validation
-                        Friend.FirstName = "";
-                    }
+                    
                 }
             }
         }
@@ -93,8 +96,15 @@ namespace FriendOrganizer.UI.ViewModel
         {
             //Friend = await _friendDataService.GetByIdAsync(friendId);  use friendwrapper instead.
             var friend = friendId.HasValue
-                ?await _friendRepository.GetByIdAsync(friendId.Value)
-                :CreateNewFriend();
+                ? await _friendRepository.GetByIdAsync(friendId.Value)
+                : CreateNewFriend();
+            InitializeFriend(friend);
+
+            await LoadProgrammingLanguageLookupAsync();
+        }
+
+        private void InitializeFriend(Friend friend)
+        {
             Friend = new FriendWrapper(friend);
             Friend.PropertyChanged += (s, e) =>
             {
@@ -110,7 +120,22 @@ namespace FriendOrganizer.UI.ViewModel
                 }
             };
             ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();//Raises CanExecuteChanged on the UI thread so every command invoker can requery to check if the command can execute.
+            if (Friend.Id == 0)//new friend is created
+            {
+                //little trick to trigger the validation
+                Friend.FirstName = "";
+            }
+        }
 
+        private async Task LoadProgrammingLanguageLookupAsync()
+        {
+            ProgrammingLanguages.Clear();
+            ProgrammingLanguages.Add(new NullLookupItem());
+            var lookup = await _programmingLanguageLookupDataService.GetProgrammingLanguageLookupAsync();
+            foreach (var lookupItem in lookup)
+            {
+                ProgrammingLanguages.Add(lookupItem);
+            }
         }
 
         private Friend CreateNewFriend()
@@ -135,6 +160,6 @@ namespace FriendOrganizer.UI.ViewModel
 
         public ICommand SaveCommand { get; } //do not need set, which is initialize directly in the constructor.
         public ICommand DeleteCommand { get; } //do not need set, which is initialize directly in the constructor.
-
+        public ObservableCollection<LookupItem> ProgrammingLanguages { get; }
     }
 }

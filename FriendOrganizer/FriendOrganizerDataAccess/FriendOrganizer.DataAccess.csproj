@@ -52,6 +52,10 @@
     <Compile Include="Migrations\201709251511447_InitalDB.Designer.cs">
       <DependentUpon>201709251511447_InitalDB.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710061546026_addProgramLanguageTable.cs" />
+    <Compile Include="Migrations\201710061546026_addProgramLanguageTable.Designer.cs">
+      <DependentUpon>201710061546026_addProgramLanguageTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -70,6 +74,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201709251511447_InitalDB.resx">
       <DependentUpon>201709251511447_InitalDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710061546026_addProgramLanguageTable.resx">
+      <DependentUpon>201710061546026_addProgramLanguageTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

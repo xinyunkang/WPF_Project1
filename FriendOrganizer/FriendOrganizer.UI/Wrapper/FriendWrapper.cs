@@ -84,5 +84,15 @@ namespace FriendOrganizer.UI.Wrapper
                 ValidateProperty(nameof(Email), value);
             }
         }
+
+        public int? FavoriteLanguageId
+        {
+            get { return Model.FavoriteLanguageId; }
+            set
+            {
+                Model.FavoriteLanguageId = value;
+                OnPropertyChanged();              
+            }
+        }
     }
 }
