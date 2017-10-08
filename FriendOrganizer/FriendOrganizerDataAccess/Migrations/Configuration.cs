@@ -43,6 +43,12 @@ namespace FriendOrganizerDataAccess.Migrations
        new ProgrammingLanguage { Name = "Swift" },
        new ProgrammingLanguage { Name = "Java" });
 
+            context.SaveChanges(); //save first to ensure that the friend id exists when save the phone number.
+
+            context.FriendPhoneNumbers.AddOrUpdate(pn => pn.Number,
+            new FriendPhoneNumber { Number = "+49 12345678", FriendId = context.Friends.First().Id });
+
+
         }
     }
 }

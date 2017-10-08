@@ -56,6 +56,10 @@
     <Compile Include="Migrations\201710061546026_addProgramLanguageTable.Designer.cs">
       <DependentUpon>201710061546026_addProgramLanguageTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710070139280_phonenumber.cs" />
+    <Compile Include="Migrations\201710070139280_phonenumber.Designer.cs">
+      <DependentUpon>201710070139280_phonenumber.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -77,6 +81,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710061546026_addProgramLanguageTable.resx">
       <DependentUpon>201710061546026_addProgramLanguageTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710070139280_phonenumber.resx">
+      <DependentUpon>201710070139280_phonenumber.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
