@@ -9,20 +9,17 @@ namespace FriendOrganizer.UI.View.Services
 {
     public class MessageDialogService : IMessageDialogService
     {
-        public enum MessageDialogResult
-        {
-            OK,
-            Cancel
-        }
-
-        public MessageDialogResult ShowOkCancelDailog(string text, string title)
+        public MessageDialogResult ShowOkCancelDialog(string text, string title)
         {
             var result = MessageBox.Show(text, title, MessageBoxButton.OKCancel);
             return result == MessageBoxResult.OK
-               ? MessageDialogResult.OK
-               : MessageDialogResult.Cancel;         
-
-            
+              ? MessageDialogResult.OK
+              : MessageDialogResult.Cancel;
         }
+    }
+    public enum MessageDialogResult
+    {
+        OK,
+        Cancel
     }
 }
