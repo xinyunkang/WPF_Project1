@@ -1,90 +1,83 @@
-﻿using FriendOrganizer.UI.Event;
+﻿using Autofac.Features.Indexed;
+using FriendOrganizer.UI.Event;
 using FriendOrganizer.UI.View.Services;
 using Prism.Commands;
 using Prism.Events;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using static FriendOrganizer.UI.View.Services.MessageDialogService;
 
 namespace FriendOrganizer.UI.ViewModel
 {
-    public class MainViewModel: ViewModelBase
+    public class MainViewModel : ViewModelBase
     {
-        
+        private IEventAggregator _eventAggregator;
+        private IDetailViewModel _detailViewModel;
+        private IMessageDialogService _messageDialogService;
+        private IIndex<string, IDetailViewModel> _detailViewModelCreator;
+
         public MainViewModel(INavigationViewModel navigationViewModel,
-            Func<IFriendDetailViewModel> friendDetailViewModelCreator,
-            IEventAggregator eventAggregator,
-            IMessageDialogService messageDialogService
-            )   //pass in the interface service
+          IIndex<string, IDetailViewModel> detailViewModelCreator,
+          IEventAggregator eventAggregator,
+          IMessageDialogService messageDialogService)
         {
-            NavigationViewModel = navigationViewModel;
-            _FriendDetailViewModelCreator = friendDetailViewModelCreator; //assign to a property
             _eventAggregator = eventAggregator;
+            _detailViewModelCreator = detailViewModelCreator;
             _messageDialogService = messageDialogService;
 
             _eventAggregator.GetEvent<OpenDetailViewEvent>()
-              .Subscribe(OnOpenDetailView);   //To subscribe the event published by NavigationViewModel.
+             .Subscribe(OnOpenDetailView);
             _eventAggregator.GetEvent<AfterDetailDeletedEvent>()
-                .Subscribe(AfterDetailDeleted);
+              .Subscribe(AfterDetailDeleted);
+
             CreateNewDetailCommand = new DelegateCommand<Type>(OnCreateNewDetailExecute);
 
+            NavigationViewModel = navigationViewModel;
         }
 
-        private void AfterDetailDeleted(AfterDetailDeletedEventArgs args)
+        public async Task LoadAsync()
         {
-            DetailViewModel = null;
+            await NavigationViewModel.LoadAsync();
+        }
+
+        public ICommand CreateNewDetailCommand { get; }
+
+        public INavigationViewModel NavigationViewModel { get; }
+
+        public IDetailViewModel DetailViewModel
+        {
+            get { return _detailViewModel; }
+            private set
+            {
+                _detailViewModel = value;
+                OnPropertyChanged();
+            }
         }
 
         private async void OnOpenDetailView(OpenDetailViewEventArgs args)
         {
             if (DetailViewModel != null && DetailViewModel.HasChanges)
             {
-               var result= _messageDialogService.ShowOkCancelDialog("You have made changes. Navigate away?", "Question");
-                if(result==MessageDialogResult.Cancel)
+                var result = _messageDialogService.ShowOkCancelDialog("You've made changes. Navigate away?", "Question");
+                if (result == MessageDialogResult.Cancel)
                 {
                     return;
                 }
             }
-            switch (args.ViewModelName)
-            {
-                case nameof(FriendDetailViewModel):
-                    DetailViewModel = _FriendDetailViewModelCreator();
-                    break;
-            }
-           
+
+            DetailViewModel = _detailViewModelCreator[args.ViewModelName];
             await DetailViewModel.LoadAsync(args.Id);
-        }
-
-        public INavigationViewModel NavigationViewModel { get; }
-
-        private Func<IFriendDetailViewModel> _FriendDetailViewModelCreator;
-
-        public async Task LoadAsync()  //naming rule, the function must start with upper case.
-        {
-            NavigationViewModel.LoadAsync();
-        }
-
-        private IDetailViewModel _detailViewModel;
-
-        public IDetailViewModel DetailViewModel
-        {
-            get { return _detailViewModel; }
-            set {
-                _detailViewModel = value;
-                OnPropertyChanged();
-            }
         }
 
         private void OnCreateNewDetailExecute(Type viewModelType)
         {
-            OnOpenDetailView(new OpenDetailViewEventArgs {
-                ViewModelName= viewModelType.Name
-            });
+            OnOpenDetailView(
+              new OpenDetailViewEventArgs { ViewModelName = viewModelType.Name });
         }
 
-        private IEventAggregator _eventAggregator;
-        private IMessageDialogService _messageDialogService;
-        public ICommand CreateNewDetailCommand { get; }
+        private void AfterDetailDeleted(AfterDetailDeletedEventArgs args)
+        {
+            DetailViewModel = null;
+        }
     }
 }

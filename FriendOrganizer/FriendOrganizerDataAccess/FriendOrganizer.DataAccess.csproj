@@ -60,6 +60,14 @@
     <Compile Include="Migrations\201710070139280_phonenumber.Designer.cs">
       <DependentUpon>201710070139280_phonenumber.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710111853390_addMeeting.cs" />
+    <Compile Include="Migrations\201710111853390_addMeeting.Designer.cs">
+      <DependentUpon>201710111853390_addMeeting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710111908471_seed.cs" />
+    <Compile Include="Migrations\201710111908471_seed.Designer.cs">
+      <DependentUpon>201710111908471_seed.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -84,6 +92,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710070139280_phonenumber.resx">
       <DependentUpon>201710070139280_phonenumber.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710111853390_addMeeting.resx">
+      <DependentUpon>201710111853390_addMeeting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710111908471_seed.resx">
+      <DependentUpon>201710111908471_seed.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
